@@ -1,0 +1,2 @@
+#!/bin/zsh
+exec /bin/egrep --color=always -w 'vmx|svm' /proc/cpuinfo
