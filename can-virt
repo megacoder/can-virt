@@ -1,2 +1,26 @@
+#!/bin/sh
 #!/bin/zsh
-exec /bin/egrep --color=always -w 'vmx|svm' /proc/cpuinfo
+function no_hvm()	{
+	/bin/egrep -w '^flags' /proc/cpuinfo	|
+	/usr/bin/head -n1			|
+	/bin/fgrep -qsw -e vmx -e svm -e hypervisor
+	return $?
+}
+function no_kvm()	{
+	[ -d /sys/class/misc/kvm ]
+	return $?
+}
+function no_xen()	{
+	/bin/egrep -qs hvm- /sys/hypervisor/properties/cababilities >/dev/null 2>&1
+	return $?
+}
+if `no_hvm`; then
+	echo "HVM"
+fi
+if `no_xen`; then
+	echo "XEN"
+fi
+if `no_kvm`; then
+	echo "KVM"
+fi
+exit
